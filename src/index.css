@@ -1,13 +1,230 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  box-sizing: border-box;
+  --bg-color: hsl(0, 0%, 97%);
+  --light-grey-40: hsl(0, 0%, 40%);
+  --light-grey-70: hsl(0, 0%, 70%);
+  --primary-color: red;
+  --secunday-color: blue;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+}
+
+button,
+input,
+select,
+textarea {
+  display: block;
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  border: none;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.hidden {
+  visibility: hidden;
+  transform: scale(0.1);
+  position: absolute;
+  right: 0px;
+}
+
+/* APP */
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* HEADER */
+
+header {
+  min-height: 5rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+form {
+  position: relative;
+  display: flex;
+  --input--height: 2.5rem;
+}
+
+.input {
+  appearance: none;
+  border: 2px solid var(--light-grey-70);
+  background-color: var(--bg-color);
+  height: var(--input--height);
+  border-radius: 50vw;
+  padding: 0 1em;
+  transition: all 150ms ease-in-out;
+}
+
+.input:hover, .input:hover~.input_btn {
+  transform: scale(1.05);
+}
+
+.input:hover~.input_btn {
+  transform: translateX(2.5px);
+}
+
+.input::placeholder {
+  color: var(--light-grey-40);
+  font-style: italic;
+}
+
+.input_btn {
+  position: absolute;
+  top: 2.5px;
+  right: 2.5px;
+  background-color: var(--light-grey-70);
+  height: calc(var(--input--height) - 5px);
+  width: calc(var(--input--height) - 5px);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+}
+
+.input_btn:hover {
+  opacity: 0.7;
+}
+
+/* LOGO */
+
+.logo_container_outter {
+  --logo-container-height: 75px;
+  width: 75px;
+  height: var(--logo-container-height);
+
+}
+
+.logo_container_outter a {
+  text-decoration: none;
+}
+
+.logo_container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: .5rem;
+  cursor: pointer;
+}
+
+.logo_letter_cont {
+  background-color: olive;
+  color: white;
+  text-align: center;
+  line-height: var(--logo-container-height);
+  flex-basis: 100%;
+  font-size: 1rem;
+}
+
+.logo_letter_cont:hover {
+    animation: jump 500ms cubic-bezier(.17,.67,.12,1.21);
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* MAIN */
+
+main {
+  flex-grow: 1;
+}
+
+/* BOOK CARDS */
+
+.card_book {
+  padding: 1em;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  width: 75vw;
+  text-align: left;
+  margin: 1em auto 1em;
+  background-color: white;
+}
+
+.card_book_textcont {
+  display: flex;
+  gap: 1em;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card_book_title {
+  margin: 0;
+  font-size: 2em;
+}
+
+.card_book_subtitle {
+  font-style: italic;
+}
+
+.card_book_author {
+  font-weight: 700;
+}
+
+.card_book_img {
+  width: 128px;
+  height: 100%;
+}
+
+/* PAGINATION */
+
+.pagination_container {
+  display: flex;
+  justify-content: space-between;
+  padding: .5rem 1rem;
+}
+
+.pagination_container p {
+  margin: 0;
+  text-align: center;
+}
+
+.pag_btn {
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--light-grey-70);
+  border-radius: 50%;
+  transition: all 150ms ease-in-out;
+}
+
+.pag_btn:hover {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+/* FOOTER */
+
+footer {
+  background-color: var(--light-grey-70);
+  padding: 1rem 2rem;
 }
