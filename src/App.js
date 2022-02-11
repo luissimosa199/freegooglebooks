@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   // setting state object and variables
-  const input = document.querySelector(".input");
+
   let requestURL = "";
 
-  const state = {
+  const protostate = {
     input: "",
     nroResultados: "",
     nroPaginas: "",
     paginaActual: "",
-    searchTerm: "",
     resultados: [],
     url: {
       base: `https://www.googleapis.com/books/v1/volumes?q=`,
@@ -25,13 +24,12 @@ function App() {
 
   // useState
 
-  const [results, setResults] = useState("");
-  const [nroResults, setNroResults] = useState("");
-  const [nroPages, setNroPages] = useState("");
-  const [currPage, setCurrPage] = useState("");
   const [actPagination, setActPagination] = useState(false);
-  const [newState, setNewState] = useState(null);
-  const [term, setTerm] = useState('');
+  const [state, newStates] = useState(protostate);
+
+  // useEffect
+
+  useEffect(() => {}, [state]);
 
   // API call
 
@@ -39,14 +37,16 @@ function App() {
     fetch(requestURL)
       .then((response) =>
         response.json().then((response) => {
-          state.nroResultados = response.totalItems;
-          setNroResults(`${state.nroResultados} resultados`);
-          state.resultados = [...response.items];
-          state.nroPaginas = Math.ceil(state.nroResultados / 10);
-          setNroPages(`${state.nroPaginas} páginas`);      
+          newStates((prevState) => {
+            return {
+              ...prevState,
+              nroResultados: response.totalItems,
+              resultados: [...response.items],
+              nroPaginas: Math.ceil(response.totalItems / 10),
+            };
+          });
+
           setActPagination(true);
-          setNewState(state);
-          setResults(mapedResults());
         })
       )
       .catch((err) => console.log(err));
@@ -57,7 +57,7 @@ function App() {
   function setURL(obj) {
     return (
       obj.url.base +
-      obj.searchTerm +
+      obj.input.replace(" ", "+").toLowerCase() +
       obj.url.startIndex +
       obj.url.index +
       obj.url.maxResults +
@@ -70,97 +70,84 @@ function App() {
   // handleClick
 
   const handleClick = () => {
-    if (inputValue === "") {
+    if (state.input === "") {
       alert("?");
     } else {
-      state.input = inputValue;
-      state.searchTerm = input.value.replace(" ", "+").toLowerCase();
-      setInputValue("");
-      state.nroResultados = "";
-      state.resultados = [];
+      newStates((prevState) => {
+        return {
+          ...prevState,
+          paginaActual: state.url.index + 1,
+        };
+      });
+
       requestURL = setURL(state);
-      state.paginaActual = state.url.index + 1;
-      setCurrPage(`Página ${state.paginaActual}`);
       fetchData(requestURL);
-      setTerm(inputValue)
-      input.value = "";
     }
   };
 
   // handleChange
 
-  const [inputValue, setInputValue] = useState(state.input);
-
   function handleChange(e) {
-    setInputValue(e.target.value);
+    newStates((prevState) => {
+      return {
+        ...prevState,
+        input: e.target.value,
+      };
+    });
   }
 
   // nextPage
 
   function nextPage() {
-    window.scroll(0,0)
+    if (state.nroPaginas === state.paginaActual) {
+      alert("?");
+    } else {
+      window.scroll(0, 0);
 
-    newState.input = term;
+      newStates((prevState) => {
+        return {
+          ...prevState,
+          paginaActual: state.paginaActual + 1,
+          url: {
+            ...prevState.url,
+            index: state.url.index + 10,
+          },
+        };
+      });
 
-    newState.searchTerm = newState.input.replace(" ", "+").toLowerCase();
-    newState.url.index = parseInt(currPage.match(/\d+/g)[0]);
-    setCurrPage(`Página ${newState.url.index + 1}`);
-
-    let newURL = setURL(newState);
-    
-    fetchData(newURL);
+      requestURL = setURL(state).replace(
+        /Index=(\d+)/g,
+        `Index=${state.url.index + 10}`
+      );
+      fetchData(requestURL);
+    }
   }
 
   // prevPage
 
   function prevPage() {
-    
-    if(parseInt(currPage.match(/\d+/g)[0]) === 1){
-      alert('?')
+    if (state.paginaActual === 1) {
+      alert("?");
     } else {
-      window.scroll(0,0)
+      window.scroll(0, 0);
 
-      newState.input = term;
+      newStates((prevState) => {
+        return {
+          ...prevState,
+          paginaActual: state.paginaActual + 1,
+          url: {
+            ...prevState.url,
+            index: state.url.index + 10,
+          },
+        };
+      });
 
-      newState.searchTerm = newState.input.replace(" ", "+").toLowerCase();
-      newState.url.index = parseInt(currPage.match(/\d+/g)[0] - 2);
-      setCurrPage(`Página ${currPage.match(/\d+/g)[0] - 1}`);
-
-      let newURL = setURL(newState);
-      
-      fetchData(newURL);
-    }
-  }
-
-  // map results
-
-  function mapedResults() {
-    let books = state.resultados.map((elem) => {
-      return (
-        <li key={elem.id}>
-          <div className='card_book'>
-            <div className='card_book_textcont'>
-              <h2 className='card_book_title'>{elem.volumeInfo.title}</h2>
-              <p className='card_book_subtitle'>{elem.volumeInfo.subtitle}</p>
-              <p className='card_book_author'>{elem.volumeInfo.authors}</p>
-              <p className='card_book_date'>{elem.volumeInfo.publishedDate}</p>
-              <a
-                className='btn card_book_btn'
-                href={elem.volumeInfo.previewLink}>
-                Leer
-              </a>
-            </div>
-            <img
-              className='card_book_img'
-              alt='book cover'
-              loading='lazy'
-              src={elem.volumeInfo.imageLinks.thumbnail}></img>
-          </div>
-        </li>
+      requestURL = setURL(state).replace(
+        /Index=(\d+)/g,
+        `Index=${state.url.index - 10}`
       );
-    });
-
-    return books;
+      fetchData(requestURL);
+    }
   }
 
   return (
@@ -169,22 +156,23 @@ function App() {
 
       <header>
         <div className='logo_container_outter'>
-          <a href="http://localhost:3000/">
-          <div className='logo_container'>
-            <div className='logo_letter_cont'>F</div>
-            <div className='logo_letter_cont'>G</div>
-            <div className='logo_letter_cont'>B</div>
-          </div>
+          <a href='https://luissimosa199.github.io/freegooglebooks/'>
+            <div className='logo_container'>
+              <div className='logo_letter_cont'>F</div>
+              <div className='logo_letter_cont'>G</div>
+              <div className='logo_letter_cont'>B</div>
+            </div>
           </a>
         </div>
-        <div className='nroResultados'>{nroResults}</div>
-        <div className="term">{term}</div>
+        {state.nroResultados && (
+          <div className='nroResultados'>{`${state.nroResultados} resultados`}</div>
+        )}
         <form>
           <input
             type='text'
             className='input'
             placeholder='Palabra clave'
-            value={inputValue}
+            value={state.input}
             onChange={handleChange}
           />
           <button className='btn input_btn' type='button' onClick={handleClick}>
@@ -199,7 +187,40 @@ function App() {
         {/* RESULTS COMPONENT */}
 
         <div className='results_container'>
-          <ul>{results}</ul>
+          <ul>
+            {state.resultados.map((elem) => {
+              return (
+                <li key={elem.id}>
+                  <div className='card_book'>
+                    <div className='card_book_textcont'>
+                      <h2 className='card_book_title'>
+                        {elem.volumeInfo.title}
+                      </h2>
+                      <p className='card_book_subtitle'>
+                        {elem.volumeInfo.subtitle}
+                      </p>
+                      <p className='card_book_author'>
+                        {elem.volumeInfo.authors}
+                      </p>
+                      <p className='card_book_date'>
+                        {elem.volumeInfo.publishedDate}
+                      </p>
+                      <a
+                        className='btn card_book_btn'
+                        href={elem.volumeInfo.previewLink}>
+                        Leer
+                      </a>
+                    </div>
+                    <img
+                      className='card_book_img'
+                      alt='book cover'
+                      loading='lazy'
+                      src={elem.volumeInfo.imageLinks.thumbnail}></img>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
         {/* // */}
@@ -208,10 +229,12 @@ function App() {
 
         {actPagination && (
           <div className='pagination_container'>
-            <button className='pag_btn prevPage' onClick={prevPage}>&lt;</button>
+            <button className='pag_btn prevPage' onClick={prevPage}>
+              &lt;
+            </button>
             <div className='pagination_text'>
-              <p>{currPage}</p>
-              <p>{nroPages}</p>
+              <p>{`Página ${state.paginaActual}`}</p>
+              <p>{`${state.nroPaginas} paginas`}</p>
             </div>
             <button className='pag_btn nextPage' onClick={nextPage}>
               &gt;
