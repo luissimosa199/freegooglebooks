@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/freegooglebooks/static/css/main.a68fb864.css",
+    "main.js": "/freegooglebooks/static/js/main.c1d73af5.js",
+    "index.html": "/freegooglebooks/index.html",
+    "main.a68fb864.css.map": "/freegooglebooks/static/css/main.a68fb864.css.map",
+    "main.c1d73af5.js.map": "/freegooglebooks/static/js/main.c1d73af5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a68fb864.css",
+    "static/js/main.c1d73af5.js"
+  ]
+}
