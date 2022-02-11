@@ -134,10 +134,10 @@ function App() {
       newStates((prevState) => {
         return {
           ...prevState,
-          paginaActual: state.paginaActual + 1,
+          paginaActual: state.paginaActual - 1,
           url: {
             ...prevState.url,
-            index: state.url.index + 10,
+            index: state.url.index - 10,
           },
         };
       });
